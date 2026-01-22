@@ -74,7 +74,7 @@ function initSocket() {
         .build();
 
     connection.on("ReceiveMarketUpdate", event => {
-        console.log(event.timestamp);
+        
         var e = event.data;
         "undefined" != e &&
             (allActiveAndWatchObj = JSON.parse(e)).hasOwnProperty("Table") &&
