@@ -65,7 +65,6 @@ $("#rdPercentage").on("change", function () {
         localStorage.setItem("changetype", "rdAbsolute");
     });
 function initSocket() {
-
     const connection = new signalR.HubConnectionBuilder()
         .withUrl("https://Prod-tradingapi.sanaitatechnologies.com/hub/market", {
             withCredentials: true
@@ -74,7 +73,7 @@ function initSocket() {
         .build();
 
     connection.on("ReceiveMarketUpdate", event => {
-        
+
         var e = event.data;
         "undefined" != e &&
             (allActiveAndWatchObj = JSON.parse(e)).hasOwnProperty("Table") &&
@@ -544,7 +543,12 @@ function SetWatchTradeDetails(e) {
             ')" type="button" class="btn btn-danger btn-sm btn-Sell"> S </button> ',
         C = '<input Name="hiddenCode" value="' + e.ScriptCode + '" type="hidden" >',
         D = '<input Name="Scripttype" value="' + e.Scripttype + '" type="hidden" >',
-        A = f + m + L + C + D,
+        CH = '<button id="btnChart' + e.ScriptCode + '" ' +
+            'data-scriptcode="' + e.ScriptCode + '" ' +
+            'onclick="ViewChart(' + e.ScriptCode + ',' + p + ')" ' +
+            'type="button" class="btn btn-icon  btn-sm btn-primary btn-ChartBtn" > C ' +
+            '</button>',
+        A = f + m + L + C + CH + D,
         O = $("#Role_Id").val();
     "RT" == Companyinitials && "2" == O && (A = C + D);
     var M = "";
@@ -1573,3 +1577,30 @@ $("#DrScriptExchange").on("change", function () {
         $('#SearchScript').show();
     SetTradeDataForWatch();
 });
+function ViewChart(scriptCode, ScriptSymbol) {
+    console.log("Loading chart for:", scriptCode);
+
+    // example:
+    $('#ModalBasicChart').data('scriptcode', scriptCode);
+    $("#Chart-modal-title").text(ScriptSymbol.toString());
+    $("#ModalBasicChart").modal("show");
+    $('#ModalBasicChart').dialog({
+        open: function () {
+            currentScriptCode = $(this).data('scriptcode');
+
+            resetChartState();
+            initChart();
+            attachUIEvents();
+            loadChartData();
+        },
+        close: function () {
+            stopAutoRefresh();
+        }
+    });
+    // load chart data here
+
+}
+function HideModalBasicChart() {
+    $('#ModalBasicChart').dialog('destroy');
+    $("#ModalBasicChart").modal("hide");
+}
